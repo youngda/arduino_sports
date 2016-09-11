@@ -1,5 +1,5 @@
-//2016年9月9号第一次调试(youngda)
-
+//2016年9月11号第一次调试(youngda)
+//{"datastreams":[{"stu_id":"201415541001","test_id":"SitAndReach","datapoints":[{"value":21.32}]}]}
 #include <SoftwareSerial.h>
 String comdata = "";
 SoftwareSerial WIFISerial(8, 9);     // RX, TX
@@ -8,7 +8,7 @@ const int EchoPin = 3;
 const int key = 4;
 int a = 250;                          //a是光照参考值
 float distance, max_t = -20.00; 
-
+#define test_id "SitAndReach"
 void wifi_data(){
       
   while (Serial.available() > 0)  
@@ -19,10 +19,8 @@ void wifi_data(){
   if (comdata.length() > 0)
     {
         Serial.println(comdata);
-        WIFISerial.println("AT+CIPSEND=0,11"); 
-        delay(500);
-        WIFISerial.println(comdata);
-        delay(500);
+        //WIFISerial.println(comdata);
+       // delay(500);
         comdata = "";
     }  
 
@@ -56,7 +54,15 @@ bool doCmdOk(String data, char *keyword)
   delay(500); //指令时间间隔
   return result;
 }
-
+void send_data(String student_id,String testmode_id,float thisdata){
+  Serial.print("{\"datastreams\":[{\"stu_id\":\"");
+  Serial.print(student_id);
+  Serial.print("\",\"test_id\":\"");
+  Serial.print(testmode_id);
+  Serial.print("\",\"datapoints\":[{\"value\":");
+  Serial.print(thisdata);
+  Serial.print("}]}]}");
+  }
 void setup() 
 {   // 初始化串口通信及连接SR04的引脚
         Serial.begin(9600);
@@ -87,7 +93,7 @@ void distance_max()
         digitalWrite(TrigPin, HIGH); 
         delayMicroseconds(10);
         digitalWrite(TrigPin, LOW); 
-    // 检测脉冲宽度，并计算出距离
+     //检测脉冲宽度，并计算出距离
         distance = 50-(pulseIn(EchoPin, HIGH) / 58.00);
         if(distance>max_t)
         {
@@ -105,19 +111,18 @@ void loop()
  if(analogRead(A0) >= a ) {          
     delay(10); 
     if(analogRead(A0) >= a ){             
-    distance_max();                                         
-      if(digitalRead(key) == HIGH){
+    distance_max();                                                       
+        }
+      }
+    if(digitalRead(key) == HIGH){
       delay(10);
         if(digitalRead(key) == HIGH){
         delay(10);
         while(digitalRead(key) == HIGH);
-        WIFISerial.println("AT+CIPSEND=0,5"); 
-        delay(500);
-        WIFISerial.println(max_t);
-        delay(500); 
-        max_t = -20;                
-        }
-      }
+        send_data(comdata,test_id,max_t);
+        //WIFISerial.println(max_t);
+       // delay(500); 
+        max_t = -20;  
    } 
  }      
 delay(100); 
