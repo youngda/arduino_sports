@@ -18,10 +18,10 @@ void wifi_data(){
     }
   if (comdata.length() > 0)
     {
-        Serial.println(comdata);
+        //Serial.println(comdata);
         //WIFISerial.println(comdata);
-       // delay(500);
-        comdata = "";
+         // delay(500);
+        //comdata = "";
     }  
 
 }
@@ -62,6 +62,14 @@ void send_data(String student_id,String testmode_id,float thisdata){
   Serial.print("\",\"datapoints\":[{\"value\":");
   Serial.print(thisdata);
   Serial.print("}]}]}");
+  WIFISerial.print("{\"datastreams\":[{\"stu_id\":\"");
+  WIFISerial.print(student_id);
+  WIFISerial.print("\",\"test_id\":\"");
+  WIFISerial.print(testmode_id);
+  WIFISerial.print("\",\"datapoints\":[{\"value\":");
+  WIFISerial.print(thisdata);
+  WIFISerial.print("}]}]}");
+  
   }
 void setup() 
 {   // 初始化串口通信及连接SR04的引脚
@@ -79,7 +87,7 @@ void setup()
         while (!doCmdOk("AT", "OK"));
         while (!doCmdOk("AT+CWMODE=1", "OK"));            //工作模式
         while (!doCmdOk("AT+CWJAP=\"TP-LINK_B06460\",\"xgxy901901\"", "OK"));
-        while (!doCmdOk("AT+CIPSTART=\"TCP\",\"192.168.1.101\",8081", "OK"));
+        while (!doCmdOk("AT+CIPSTART=\"TCP\",\"192.168.1.106\",8081", "OK"));
         while (!doCmdOk("AT+CIPMODE=1", "OK"));           //透传模式
         while (!doCmdOk("AT+CIPSEND", ">"));              //开始发送
         WIFISerial.println("00000000000");
@@ -122,7 +130,8 @@ void loop()
         send_data(comdata,test_id,max_t);
         //WIFISerial.println(max_t);
        // delay(500); 
-        max_t = -20;  
+        max_t = -20; 
+        comdata = ""; 
    } 
  }      
 delay(100); 
